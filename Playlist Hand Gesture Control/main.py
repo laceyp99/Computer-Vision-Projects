@@ -15,6 +15,11 @@ prev_y_vals = deque(maxlen=5)
 last_change_time = 0
 volume_level = 50  # Start at midpoint
 
+# Global variables for play/pause actions
+last_action_time = 0
+cooldown_duration = 1.5  # seconds
+
+
 def count_fingers(hand_landmarks):
     # Tip landmarks for each finger (excluding thumbs to keep it simple and allow for either hand to be used)
     tips = [8, 12, 16, 20]
@@ -83,6 +88,14 @@ with mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.7) a
                 else:
                     volume_mode = False
                     prev_y_vals.clear()
+                
+                # Open palm gesture for play/pause
+                current_time = time.time()
+                if fingers_up >= 4 and (current_time - last_action_time) > cooldown_duration:
+                    actions.toggle_play_pause()
+                    cv2.putText(frame, "PLAY/PAUSE TOGGLED", (10, 130), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                    last_action_time = current_time
+
 
         cv2.imshow("Hand Tracker", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
