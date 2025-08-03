@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 from collections import deque
 import time
+import actions
 
 # Initialize MediaPipe Hands
 cap = cv2.VideoCapture(0)
@@ -39,6 +40,7 @@ def update_volume(current_y):
                 volume_level = max(0, volume_level - 3)
             last_change_time = time.time()
             # print("Volume:", volume_level)
+            actions.set_system_volume(volume_level / 100)
 
     prev_y_vals.append(current_y)
 
@@ -49,7 +51,7 @@ with mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.7) a
         if not ret:
             break
 
-        # frame = cv2.flip(frame, 1)  # Mirror image
+        frame = cv2.flip(frame, 1)  # Mirror image
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = hands.process(rgb)
 
@@ -64,6 +66,12 @@ with mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.7) a
                 wrist_pixel_y = int(wrist_y * h)
                 cv2.putText(frame, f"Wrist Y: {wrist_pixel_y}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                 
+                # Get x of wrist for swipe gesture
+                wrist_x = hand_landmarks.landmark[0].x  # Normalized 0
+                h, w, _ = frame.shape
+                wrist_pixel_x = int(wrist_x * w)
+                cv2.putText(frame, f"Wrist X: {wrist_pixel_x}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
                 # Count fingers
                 fingers_up = count_fingers(hand_landmarks)
                 
