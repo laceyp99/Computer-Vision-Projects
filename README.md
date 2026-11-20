@@ -1,5 +1,7 @@
 # Computer Vision Projects
 
+> **Archived.** Early computer vision experiments, kept as a record. Not maintained.
+
 This repository contains my collection of computer vision projects where I learn and experiment with different techniques.
 
 ## About
